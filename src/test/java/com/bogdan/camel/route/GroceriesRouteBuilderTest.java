@@ -3,9 +3,7 @@ package com.bogdan.camel.route;
 import com.bogdan.camel.model.Fruit;
 import com.bogdan.camel.model.Vegetable;
 import org.apache.camel.CamelContext;
-import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.javaconfig.SingleRouteCamelConfiguration;
@@ -80,6 +78,6 @@ public class GroceriesRouteBuilderTest {
 
         //then
         vegetableProcessor.expectedBodiesReceived(potato, 3000);
-    }
+    }   
 
 }
