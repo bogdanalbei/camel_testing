@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 
@@ -22,6 +23,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration(
         classes = {GroceriesRouteBuilderTest.ContextConfig.class},
         loader = CamelSpringDelegatingTestContextLoader.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GroceriesRouteBuilderTest {
     @Autowired
     @Qualifier(GroceriesRouteBuilder.FRUIT_PROCESSOR)
@@ -55,7 +57,7 @@ public class GroceriesRouteBuilderTest {
     }
 
     @Test
-    public void test_fruit_is_routed_to_the_fruits_processor_via_groceries_queue() {
+    public void test_fruit_is_routed_to_the_fruits_processor_via_groceries_queue() throws InterruptedException {
         //given
         Fruit apple = new Fruit("apple", "England");
         ProducerTemplate producer = camelContext.createProducerTemplate();
@@ -64,11 +66,15 @@ public class GroceriesRouteBuilderTest {
         producer.sendBody(GroceriesRouteBuilder.GROCERIES_QUEUE, apple);
 
         //then
-        fruitProcessor.expectedBodiesReceived(apple, 3000);
+        fruitProcessor.expectedBodiesReceived(apple);
+        fruitProcessor.assertIsSatisfied();
+
+        vegetableProcessor.expectedMessageCount(0);
+        vegetableProcessor.assertIsSatisfied();
     }
 
     @Test
-    public void test_vegetable_is_routed_to_the_fruits_processor_via_groceries_queue() {
+    public void test_vegetable_is_routed_to_the_fruits_processor_via_groceries_queue() throws InterruptedException {
         //given
         Vegetable potato = new Vegetable("potato", "Scotland");
         ProducerTemplate producer = camelContext.createProducerTemplate();
@@ -77,7 +83,10 @@ public class GroceriesRouteBuilderTest {
         producer.sendBody(GroceriesRouteBuilder.GROCERIES_QUEUE, potato);
 
         //then
-        vegetableProcessor.expectedBodiesReceived(potato, 3000);
-    }   
+        vegetableProcessor.expectedBodiesReceived(potato);
+        vegetableProcessor.assertIsSatisfied();
 
+        fruitProcessor.expectedMessageCount(0);
+        fruitProcessor.assertIsSatisfied();
+    }
 }

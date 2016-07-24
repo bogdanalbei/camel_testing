@@ -12,21 +12,21 @@ public class GroceriesRouteBuilder extends RouteBuilder {
     public static final String VEGETABLE_PROCESSOR = "vegetableProcessor";
 
     public void configure() {
-        from(VEGETABLES_QUEUE)
-                .to(FRUIT_PROCESSOR);
-
         from(FRUITS_QUEUE)
-                .to(VEGETABLE_PROCESSOR);
+            .to(FRUIT_PROCESSOR);
+
+        from(VEGETABLES_QUEUE)
+            .to(VEGETABLE_PROCESSOR);
 
         from(GROCERIES_QUEUE)
-                .choice()
-                    //fruits go to the fruits queue
-                    .when(body().isInstanceOf(Fruit.class))
-                        .to(FRUITS_QUEUE)
-                    //vegetables go to the vegetables queue
-                .when(body().isInstanceOf(Vegetable.class))
-                        .to(VEGETABLES_QUEUE)
-                .endChoice();
+            .choice()
+             //fruits go to the fruits queue
+            .when(body().isInstanceOf(Fruit.class))
+                .to(FRUITS_QUEUE)
+             //vegetables go to the vegetables queue
+            .when(body().isInstanceOf(Vegetable.class))
+                .to(VEGETABLES_QUEUE)
+            .endChoice();
     }
 
 }
